@@ -7,17 +7,38 @@ from .serializers import UserSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class SignupView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    
     def post(self, request):
         is_valid, err_msg = validate_signup(request.data)
         if not is_valid:
             return Response({"error": err_msg}, status=400)
 
-        user = User.objects.create_user(**request.data)
+        username = request.data.get("username")
+        password = request.data.get("password")
+        email = request.data.get("email")
+        first_name = request.data.get("first_name", "")
+        last_name = request.data.get("last_name", "")
+        introductions = request.data.get("introductions", "")
+        profile_image = request.FILES.get("profile_image")
+
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            introductions=introductions,
+            profile_image=profile_image
+        )
+
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
 
 
 class SigninView(APIView):
