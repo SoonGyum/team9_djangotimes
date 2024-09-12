@@ -6,6 +6,7 @@ from .validators import validate_signup
 from .serializers import UserSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 
 
 class SignupView(APIView):
@@ -32,3 +33,12 @@ class SigninView(APIView):
         res_data["access_token"] = str(refresh.access_token)
         res_data["refresh_token"] = str(refresh)
         return Response(res_data)
+
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, username):
+        user = User.objects.get(username=username)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
