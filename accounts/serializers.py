@@ -10,4 +10,5 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "profile_image",
             "introductions",
+            "created_at",
         )

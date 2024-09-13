@@ -5,10 +5,6 @@ from .models import User
 def validate_signup(signup_data):
     username = signup_data.get("username")
     password = signup_data.get("password")
-    nickname = signup_data.get("nickname")
-    birth = signup_data.get("birth")
-    first_name = signup_data.get("first_name")
-    last_name = signup_data.get("last_name")
     email = signup_data.get("email")
 
     err_msg_list = []
