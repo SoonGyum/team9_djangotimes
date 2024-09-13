@@ -32,16 +32,17 @@ class ArticleListView(ListAPIView):
             )
         return Article.objects.all()
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         articles = Article.objects.all()
         serializer = ArticleSerializer(articles, many=True)
 
     def post(self, request):
-        title = request.get("title")
-        content = request.get("content")
-        file = request.get("file")
-        url = request.get("url")
-        category_id_text = request.get("category")
+        title = request.data.get("title")
+        content = request.data.get("content")
+        file = request.data.get("file")
+        url = request.data.get("url")
+        category_id_text = request.data.get("category")
+        user_id = request.data.get("user_id")
 
         category = Category.objects.get(id=category_id_text)
 
@@ -51,13 +52,14 @@ class ArticleListView(ListAPIView):
             file=file,
             url=url,
             category=category,
+            user_id=user_id,
         )
 
         serializer = ArticleSerializer(article)
         return Response(serializer.data)
 
 
-class CategoryListView(APIView):
+class CategoryListView(ListAPIView):
     serializer_class = ArticleSerializer
     queryset = Article.objects.all()
 

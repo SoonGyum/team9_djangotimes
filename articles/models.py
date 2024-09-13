@@ -11,15 +11,7 @@ class TimeStampedModel(models.Model):
 
 
 class Category(models.Model):
-    CATEGORY_CHOICES = (
-        ("1", "정치"),
-        ("2", "경제"),
-        ("3", "사회"),
-        ("4", "생활/문화"),
-        ("5", "세계"),
-        ("6", "IT/과학"),
-    )
-    name = models.CharField(max_length=1, choices=CATEGORY_CHOICES, unique=True)
+    name = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return self.name
@@ -31,7 +23,11 @@ class Article(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     # file은 선택사항
     file = models.FileField(upload_to="articles/", null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        "Category",
+        on_delete=models.CASCADE,
+        related_name="articles",
+    )
     # url은 선택사항
     url = models.URLField(max_length=200, blank=True, null=True)
 
