@@ -4,7 +4,7 @@ from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
     RetrieveAPIView,
-    UpdateAPIView,
+    UpdateAPIView, DestroyAPIView,
 )
 from rest_framework.response import Response
 from .models import Article
@@ -44,4 +44,10 @@ class ArticleUpdateView(UpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     queryset = Article.objects.all()  # 이 쿼리셋에서 객체를 찾고 업데이트
+    serializer_class = ArticleSerializer
+
+class ArticleDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    queryset = Article.objects.all()
     serializer_class = ArticleSerializer
