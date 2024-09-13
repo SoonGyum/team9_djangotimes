@@ -70,6 +70,10 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, username):
+
+        if request.user.username != username:
+            return Response({"error": "다른 사용자의 프로필에 접근할 수 없습니다."}, status=403)
+        
         user = User.objects.get(username=username)
         serializer = UserSerializer(user)
         return Response(serializer.data)
