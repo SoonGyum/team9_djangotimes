@@ -19,7 +19,7 @@ class Category(models.Model):
         ("5", "세계"),
         ("6", "IT/과학"),
     )
-    name = models.CharField(max_length=1, choices=CATEGORY_CHOICES)
+    name = models.CharField(max_length=1, choices=CATEGORY_CHOICES, unique=True)
 
     def __str__(self):
         return self.name
@@ -29,10 +29,11 @@ class Article(TimeStampedModel):
     title = models.CharField(max_length=30)
     content = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # file은 선택사항
     file = models.FileField(upload_to="articles/", null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     # url은 선택사항
     url = models.URLField(max_length=200, blank=True, null=True)
 
     def __str__(self):
-        return self.category, self.title, self.user
+        return self.title

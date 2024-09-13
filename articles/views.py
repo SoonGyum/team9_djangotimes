@@ -1,53 +1,87 @@
+from django.db.models import Q
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.generics import (
+    ListCreateAPIView,
+    get_object_or_404,
     ListAPIView,
-    CreateAPIView,
-    RetrieveAPIView,
-    UpdateAPIView, DestroyAPIView,
 )
 from rest_framework.response import Response
-from .models import Article
+from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+
+from .models import Article, Category
 from .serializers import ArticleSerializer
 
 
 # Create your views here.
 class ArticleListView(ListAPIView):
-    permission_classes = [AllowAny]
-
-    queryset = Article.objects.all()  # 모든 Article 객체 가져오기
-    serializer_class = ArticleSerializer  # 직렬화에 사용할 serializer 지정
-
-
-class ArticleCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        serializer = ArticleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer = ArticleSerializer(data=request.data)
-            serializer.save(user=request.user)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ArticleDetailView(RetrieveAPIView):
-    permission_classes = [AllowAny]
-
-    queryset = Article.objects.all()  # 이 쿼리셋에서 객체를 찾고 업데이트
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = PageNumberPagination
     serializer_class = ArticleSerializer
 
+    def get_queryset(self):
+        search = self.request.query_params.get("search")
+        if search:
+            return Article.objects.filter(
+                Q(title__icontains=search) | Q(content__icontains=search)
+            )
+        return Article.objects.all()
 
-class ArticleUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        articles = Article.objects.all()
+        serializer = ArticleSerializer(articles, many=True)
 
-    queryset = Article.objects.all()  # 이 쿼리셋에서 객체를 찾고 업데이트
+    def post(self, request):
+        title = request.get("title")
+        content = request.get("content")
+        file = request.get("file")
+        url = request.get("url")
+        category_id_text = request.get("category")
+
+        category = Category.objects.get(id=category_id_text)
+
+        article = Article.objects.create(
+            title=title,
+            content=content,
+            file=file,
+            url=url,
+            category=category,
+        )
+
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+
+class CategoryListView(APIView):
     serializer_class = ArticleSerializer
-
-class ArticleDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated]
-
     queryset = Article.objects.all()
-    serializer_class = ArticleSerializer
+
+
+class ArticleDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        return get_object_or_404(Article, pk=pk)
+
+    def get(self, request, pk):
+        article = self.get_object(pk)
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        article = self.get_object(pk)
+        serializer = ArticleSerializer(article, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
+    def delete(self, request, pk):
+        article = self.get_object(pk)
+        article.delete()
+        data = {"pk": f"{pk} is deleted."}
+        return Response(data, status=status.HTTP_200_OK)
