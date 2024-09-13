@@ -29,6 +29,7 @@ class Article(TimeStampedModel):
     title = models.CharField(max_length=30)
     content = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    file = models.FileField(upload_to="articles/", null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     # url은 선택사항
     url = models.URLField(max_length=200, blank=True, null=True)
