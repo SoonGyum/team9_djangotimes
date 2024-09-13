@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework_simplejwt.exceptions import TokenError
 
 
 class SignupView(APIView):
@@ -54,6 +55,20 @@ class SigninView(APIView):
         res_data["access_token"] = str(refresh.access_token)
         res_data["refresh_token"] = str(refresh)
         return Response(res_data)
+
+
+class SignoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token_str = request.data.get("refresh_token")
+        try:
+            refresh_token = RefreshToken(refresh_token_str)
+        except TokenError as e:
+            return Response({"msg": str(e)}, status=400)
+        
+        refresh_token.blacklist()
+        return Response(status=200)
 
 
 class ProfileView(APIView):
