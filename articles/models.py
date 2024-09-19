@@ -40,3 +40,4 @@ class Comment(TimeStampedModel):
         Article, on_delete=models.CASCADE, related_name="comments"
     )
     content = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
