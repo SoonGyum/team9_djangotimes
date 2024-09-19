@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Category, Like, Comment
+from .models import Article, Category, Like, Comment, CommentLike
 from accounts.models import User
 
 
@@ -37,17 +37,16 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    like_count = serializers.IntegerField(source="likes.count", read_only=True)
+    
     class Meta:
         model = Comment
-        fields = "__all__"
-        read_only_fields = [
-            "article",
-        ]
+        fields = ["id", "content", "user", "like_count", "created_at", "updated_at"]
+        read_only_fields = ["article"]
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret.pop("article")
-        ret["user"] = User.objects.get(pk=ret["user"]).username
+        ret["user"] = instance.user.username
         return ret
 
 
@@ -70,3 +69,4 @@ class ArticleDetailSerializer(ArticleSerializer):
             "comments",
         ]
         ordering = ["-id"]
+
