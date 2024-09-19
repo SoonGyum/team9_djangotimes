@@ -105,7 +105,16 @@ class CommentListAPIView(APIView):
 
 
 class CommentDetailAPIView(APIView):
+
+    def put(self, request, comment_pk):
+        comment = get_object_or_404(Comment, pk=comment_pk)
+        serializer = CommentSerializer(comment, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
     def delete(self, request, comment_pk):
         comment = get_object_or_404(Comment, pk=comment_pk)
         comment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        data = {"pk": f"{comment_pk} is deleted."}
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
