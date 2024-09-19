@@ -140,12 +140,17 @@ class LikeView(APIView):
     def post(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
         like, created = Like.objects.get_or_create(user=request.user, article=article)
-        
+
         if created:
-            return Response({"message": "좋아요가 추가되었습니다."}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "좋아요가 추가되었습니다."}, status=status.HTTP_201_CREATED
+            )
         else:
             like.delete()
-            return Response({"message": "좋아요가 취소되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {"message": "좋아요가 취소되었습니다."},
+                status=status.HTTP_204_NO_CONTENT,
+            )
 
 
 class LikedArticlesView(ListAPIView):
@@ -176,3 +181,4 @@ class LikedCommentsView(ListAPIView):
 
     def get_queryset(self):
         return Comment.objects.filter(likes__user=self.request.user)
+
