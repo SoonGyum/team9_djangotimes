@@ -65,7 +65,7 @@ class CategoryListView(ListAPIView):
 
 
 class ArticleDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         return get_object_or_404(Article, pk=pk)
