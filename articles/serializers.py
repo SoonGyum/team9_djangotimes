@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Article, Category, Like, Comment
+from accounts.models import User
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -46,6 +47,7 @@ class CommentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret.pop("article")
+        ret["user"] = User.objects.get(pk=ret["user"]).username
         return ret
 
 
