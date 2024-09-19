@@ -10,7 +10,16 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ["id", "title", "content", "category", "user", "file", "url", "like_count"]
+        fields = [
+            "id",
+            "title",
+            "content",
+            "category",
+            "user",
+            "file",
+            "url",
+            "like_count",
+        ]
         ordering = ["-id"]
 
 
@@ -23,7 +32,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
-        fields = ['id', 'user', 'article', 'created_at']
+        fields = ["id", "user", "article", "created_at"]
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -42,5 +51,20 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class ArticleDetailSerializer(ArticleSerializer):
     comments = CommentSerializer(many=True, read_only=True)
-
     comments_count = serializers.IntegerField(source="comments.count", read_only=True)
+
+    class Meta:
+        model = Article
+        fields = [
+            "id",
+            "title",
+            "content",
+            "category",
+            "user",
+            "file",
+            "url",
+            "like_count",
+            "comments_count",
+            "comments",
+        ]
+        ordering = ["-id"]
