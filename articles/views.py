@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 
 from .models import Article, Category
-from .serializers import ArticleSerializer
+from .serializers import ArticleSerializer, CommentSerializer
 
 
 # Create your views here.
@@ -87,3 +87,11 @@ class ArticleDetailView(APIView):
         article.delete()
         data = {"pk": f"{pk} is deleted."}
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CommentListAPIView(APIView):
+    def get(self, request, article_pk):
+        article = get_object_or_404(Article, pk=article_pk)
+        comments = article.comments.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)

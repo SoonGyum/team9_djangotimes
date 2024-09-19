@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Category
+from .models import Article, Category, Comment
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -23,3 +23,9 @@ class ArticleSerializer(serializers.ModelSerializer):
 
         rep["category"] = CategorySerializer(instance.category).data
         return rep
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = "__all__"

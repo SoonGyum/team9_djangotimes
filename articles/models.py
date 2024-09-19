@@ -33,3 +33,10 @@ class Article(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+
+class Comment(TimeStampedModel):
+    article = models.ForeignKey(
+        Article, on_delete=models.CASCADE, related_name="comments"
+    )
+    content = models.TextField()
