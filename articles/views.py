@@ -101,3 +101,11 @@ class LikeView(APIView):
         else:
             like.delete()
             return Response({"message": "좋아요가 취소되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+
+
+class LikedArticlesView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        return Article.objects.filter(likes__user=self.request.user)
