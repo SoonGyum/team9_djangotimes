@@ -10,4 +10,10 @@ urlpatterns = [
     path("category/", views.CategoryListView.as_view(), name="category_list"),
     path("<int:pk>/like/", views.LikeView.as_view(), name="article_like"),
     path("liked-articles/", views.LikedArticlesView.as_view(), name="liked_articles"),
+    path("<int:pk>/comments/", views.CommentListAPIView.as_view(), name="comment_list"),
+    path(
+        "comments/<int:comment_pk>/",
+        views.CommentDetailAPIView.as_view(),
+        name="comment_detail",
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
