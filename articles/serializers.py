@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import Article, Category
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+
+
 class ArticleSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
     file = serializers.FileField(required=False)
@@ -12,8 +18,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = ["id", "title", "content", "category", "user", "file", "url"]
         ordering = ["-id"]
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = "__all__"
+        rep["category"] = CategorySerializer(instance.category).data
+        return rep
