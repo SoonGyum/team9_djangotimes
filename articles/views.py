@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 
-from .models import Article, Category
+from .models import Article, Category, Like
 from .serializers import ArticleSerializer
 
 
@@ -87,3 +87,17 @@ class ArticleDetailView(APIView):
         article.delete()
         data = {"pk": f"{pk} is deleted."}
         return Response(data, status=status.HTTP_200_OK)
+
+
+class LikeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        like, created = Like.objects.get_or_create(user=request.user, article=article)
+        
+        if created:
+            return Response({"message": "좋아요가 추가되었습니다."}, status=status.HTTP_201_CREATED)
+        else:
+            like.delete()
+            return Response({"message": "좋아요가 취소되었습니다."}, status=status.HTTP_204_NO_CONTENT)

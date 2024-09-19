@@ -8,4 +8,5 @@ urlpatterns = [
     path("", views.ArticleListView.as_view(), name="article_list"),
     path("<int:pk>/", views.ArticleDetailView.as_view(), name="article_detail"),
     path("category/", views.CategoryListView.as_view(), name="category_list"),
+    path("<int:pk>/like/", views.LikeView.as_view(), name="article_like"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
