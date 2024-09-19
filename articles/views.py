@@ -35,6 +35,7 @@ class ArticleListView(ListAPIView):
     def get(self, request, *args, **kwargs):
         articles = Article.objects.all()
         serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
         title = request.data.get("title")
@@ -42,7 +43,6 @@ class ArticleListView(ListAPIView):
         file = request.data.get("file")
         url = request.data.get("url")
         category_id_text = request.data.get("category")
-        user_id = request.data.get("user_id")
 
         category = Category.objects.get(id=category_id_text)
 
@@ -52,7 +52,7 @@ class ArticleListView(ListAPIView):
             file=file,
             url=url,
             category=category,
-            user_id=user_id,
+            user = request.user,
         )
 
         serializer = ArticleSerializer(article)
