@@ -118,10 +118,14 @@ class CommentDetailAPIView(APIView):
 
     def put(self, request, comment_pk):
         comment = self.get_object(comment_pk)
-        serializer = CommentSerializer(comment, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+        content = request.data.get("content")
+
+        # 필드 값을 직접 수정
+        comment.content = content
+        comment.user = request.user
+        comment.save()
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
 
     def delete(self, request, comment_pk):
         comment = self.get_object(comment_pk)
