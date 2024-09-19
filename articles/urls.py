@@ -11,7 +11,7 @@ urlpatterns = [
     path("<int:pk>/comments/", views.CommentListAPIView.as_view(), name="comment_list"),
     path(
         "comments/<int:comment_pk>/",
-        views.CommentDetailView.as_view(),
+        views.CommentDetailAPIView.as_view(),
         name="comment_detail",
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
