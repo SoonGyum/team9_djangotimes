@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 
-from .models import Article, Category, Like, Comment
+from .models import Article, Category, Like, Comment, CommentLike
 from .serializers import ArticleSerializer, CommentSerializer, ArticleDetailSerializer
 
 
@@ -72,7 +72,7 @@ class ArticleDetailView(APIView):
 
     def get(self, request, pk):
         article = self.get_object(pk)
-        serializer = ArticleDetailView(article)
+        serializer = ArticleDetailSerializer(article)
         return Response(serializer.data)
 
     def put(self, request, pk):
@@ -156,3 +156,23 @@ class LikedArticlesView(ListAPIView):
         return Article.objects.filter(likes__user=self.request.user)
 
 
+class CommentLikeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, comment_pk):
+        comment = get_object_or_404(Comment, pk=comment_pk)
+        like, created = CommentLike.objects.get_or_create(user=request.user, comment=comment)
+
+        if created:
+            return Response({"message": "댓글에 좋아요를 눌렀습니다."}, status=status.HTTP_201_CREATED)
+        else:
+            like.delete()
+            return Response({"message": "댓글에 좋아요를 취소했습니다."}, status=status.HTTP_204_NO_CONTENT)
+
+
+class LikedCommentsView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.filter(likes__user=self.request.user)

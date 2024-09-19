@@ -43,9 +43,19 @@ class Like(models.Model):
     class Meta:
         unique_together = ('user', 'article')
 
+
 class Comment(TimeStampedModel):
     article = models.ForeignKey(
         Article, on_delete=models.CASCADE, related_name="comments"
     )
     content = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class CommentLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name="likes")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'comment')
