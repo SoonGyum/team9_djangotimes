@@ -38,7 +38,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(source="likes.count", read_only=True)
-    
+
     class Meta:
         model = Comment
         fields = ["id", "content", "user", "like_count", "created_at", "updated_at"]
@@ -67,6 +67,7 @@ class ArticleDetailSerializer(ArticleSerializer):
             "like_count",
             "comments_count",
             "comments",
+            "created_at",
+            "updated_at",
         ]
         ordering = ["-id"]
-
